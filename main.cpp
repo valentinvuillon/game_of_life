@@ -226,7 +226,7 @@ class button{
 		text.setString(str);
 		text.setCharacterSize(text_size);
 		text.setFillColor(color);
-		text.setPosition(sf::Vector2f(x_coord + 15, y_coord + 9));
+		text.setPosition(sf::Vector2f(x_coord + 10, y_coord ));
 	}
 
 	void draw(sf::RenderWindow& window)
@@ -256,7 +256,7 @@ int main()
 	unsigned int nb_rows = 48;
 	unsigned int nb_columns = 70;
 
-	unsigned int cell_size = 37;
+	unsigned int cell_size = 25;
 	unsigned int right_panel_width = 300;
 
 	unsigned int width = nb_columns * cell_size + right_panel_width; 
@@ -265,7 +265,7 @@ int main()
 	sf::RenderWindow window(sf::VideoMode({ width, height }), "game of life");
 	window.setFramerateLimit(20);
 
-	line_group grid(nb_rows, nb_columns, cell_size, sf::Color(255, 255, 255, 50));
+	line_group grid(nb_rows, nb_columns, cell_size, sf::Color(255, 255, 255, 35));
 	game_of_life gol(nb_rows, nb_columns, cell_size);
 	
 	bool paused = true;

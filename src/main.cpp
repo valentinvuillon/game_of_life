@@ -271,7 +271,7 @@ int main()
 	
 	bool paused = true;
 
-	sf::Font font("Arial.ttf");
+	sf::Font font("font/Arial.ttf");
 	button pause_button(nb_columns * cell_size +5, 5, right_panel_width -10, 2 * cell_size, "play/pause", font, sf::Color::Black, 25);
 	button clear_button(nb_columns * cell_size +5, 10 + 2 * cell_size, right_panel_width -10, 2 * cell_size, "clear", font, sf::Color::Black, 25);
 	button random_button(nb_columns * cell_size +5, 15 + 4 * cell_size, right_panel_width -10, 2 * cell_size, "random init", font, sf::Color::Black, 25);

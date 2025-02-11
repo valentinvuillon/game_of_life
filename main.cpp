@@ -226,7 +226,7 @@ class button{
 		text.setString(str);
 		text.setCharacterSize(text_size);
 		text.setFillColor(color);
-		text.setPosition(sf::Vector2f(x_coord + 10, y_coord ));
+		text.setPosition(sf::Vector2f(x_coord + 5, y_coord ));
 	}
 
 	void draw(sf::RenderWindow& window)
@@ -253,11 +253,12 @@ class button{
 
 int main()
 {
-	unsigned int nb_rows = 48;
-	unsigned int nb_columns = 70;
 
-	unsigned int cell_size = 25;
-	unsigned int right_panel_width = 300;
+	unsigned int nb_rows = 40;
+	unsigned int nb_columns = 65;
+
+	unsigned int cell_size = 20;
+	unsigned int right_panel_width = 150;
 
 	unsigned int width = nb_columns * cell_size + right_panel_width; 
 	unsigned int height = nb_rows * cell_size;
@@ -265,15 +266,15 @@ int main()
 	sf::RenderWindow window(sf::VideoMode({ width, height }), "game of life");
 	window.setFramerateLimit(20);
 
-	line_group grid(nb_rows, nb_columns, cell_size, sf::Color(255, 255, 255, 35));
+	line_group grid(nb_rows, nb_columns, cell_size, sf::Color(255, 255, 255, 50));
 	game_of_life gol(nb_rows, nb_columns, cell_size);
 	
 	bool paused = true;
 
 	sf::Font font("Arial.ttf");
-	button pause_button(nb_columns * cell_size +5, 5, right_panel_width -10, 2 * cell_size, "play/pause", font, sf::Color::Black, 40);
-	button clear_button(nb_columns * cell_size +5, 10 + 2 * cell_size, right_panel_width -10, 2 * cell_size, "clear", font, sf::Color::Black, 40);
-	button random_button(nb_columns * cell_size +5, 15 + 4 * cell_size, right_panel_width -10, 2 * cell_size, "random init", font, sf::Color::Black, 40);
+	button pause_button(nb_columns * cell_size +5, 5, right_panel_width -10, 2 * cell_size, "play/pause", font, sf::Color::Black, 25);
+	button clear_button(nb_columns * cell_size +5, 10 + 2 * cell_size, right_panel_width -10, 2 * cell_size, "clear", font, sf::Color::Black, 25);
+	button random_button(nb_columns * cell_size +5, 15 + 4 * cell_size, right_panel_width -10, 2 * cell_size, "random init", font, sf::Color::Black, 25);
 
 
 	while(window.isOpen()){

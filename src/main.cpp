@@ -1,10 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include "random.hpp"
+#include <random>
 #include <string>
 
-
-using Random = effolkronium::random_static;
 
 class line {
 public:
@@ -191,9 +189,15 @@ class game_of_life{
 	}
 
 	void random(){
+		// Create a random device and seed the generator
+		std::random_device rd;
+		std::mt19937 gen(rd());
+
+		std::uniform_int_distribution<> distrib(0, 100);
+
 		for(int i = 0; i < nb_rows; i++){
 			for(int j=0; j < nb_columns; j++){
-				if(Random::get(0, 100)>90){
+				if(distrib(gen)>80){
 					current_state[i][j] = 1;
 				}else{
 					current_state[i][j] = 0;
@@ -201,7 +205,6 @@ class game_of_life{
 			}
 		}
 	}
-
 };
 
 void screen_coord_to_cell_coord(int screen_coord_x, int screen_coord_y, int& row, int& column, unsigned int cell_size){
@@ -215,44 +218,56 @@ class button{
 	unsigned int y_coord;
 	unsigned int width;
 	unsigned int height;
-	sf::Text text;
+	sf::RectangleShape box;
 
-	button(unsigned int x_coord_, unsigned int y_coord_, unsigned int width_, unsigned int height_, std::string str, sf::Font& font, sf::Color color, int text_size): text(font){
+	sf::Text text;
+	sf::Color box_color;
+
+	button(unsigned int x_coord_, unsigned int y_coord_, unsigned int width_, unsigned int height_, sf::Color box_color_, std::string str, sf::Font& font, sf::Color text_color, int font_size)
+	: text(font), box(sf::Vector2f(width_, height_))
+	{
 		x_coord = x_coord_;
 		y_coord = y_coord_;
 		width = width_;
 		height = height_;
 
+		box_color = box_color_;
+		box.setPosition(sf::Vector2f(x_coord, y_coord));
+		box.setFillColor(box_color_);
+
 		text.setString(str);
-		text.setCharacterSize(text_size);
-		text.setFillColor(color);
+		text.setCharacterSize(font_size);
+		text.setFillColor(text_color);
 		text.setPosition(sf::Vector2f(x_coord + 5, y_coord ));
 	}
 
-	void draw(sf::RenderWindow& window)
-	{
-		sf::RectangleShape rectangle(sf::Vector2f(width, height));
-		rectangle.setPosition(sf::Vector2f(x_coord, y_coord));
-		window.draw(rectangle);
-
+	void draw(sf::RenderWindow& window){
+		window.draw(box);
 		window.draw(text);
 	}
 
-	bool pressed(unsigned int pos_x, unsigned int pos_y)
-	{
-		if(pos_x > x_coord && pos_x < x_coord + width && pos_y > y_coord && pos_y < y_coord + height)
-		{
+	bool pressed(unsigned int pos_x, unsigned int pos_y){
+		if(pos_x > x_coord && pos_x < x_coord + width && pos_y > y_coord && pos_y < y_coord + height){
+
+			sf::Color new_color(box.getFillColor());
+			new_color.a = new_color.a - 100;
+			box.setFillColor(new_color);
+
 			return true;
+
 		}else{
 			return false;
 		}
+	}
+
+	void reset(){
+		box.setFillColor(box_color);
 	}
 	
 };
 
 
-int main()
-{
+int main(){
 
 	unsigned int nb_rows = 40;
 	unsigned int nb_columns = 65;
@@ -271,25 +286,27 @@ int main()
 	
 	bool paused = true;
 
-	sf::Font font("font/Arial.ttf");
-	button pause_button(nb_columns * cell_size +5, 5, right_panel_width -10, 2 * cell_size, "play/pause", font, sf::Color::Black, 25);
-	button clear_button(nb_columns * cell_size +5, 10 + 2 * cell_size, right_panel_width -10, 2 * cell_size, "clear", font, sf::Color::Black, 25);
-	button random_button(nb_columns * cell_size +5, 15 + 4 * cell_size, right_panel_width -10, 2 * cell_size, "random init", font, sf::Color::Black, 25);
+	int font_size = 20;
+	sf::Font font("Arial.ttf");
+	button pause_button(nb_columns * cell_size +5, 5, right_panel_width -10, 2 * cell_size, sf::Color::White, "play/pause", font, sf::Color::Black, font_size);
+	button clear_button(nb_columns * cell_size +5, 10 + 2 * cell_size, right_panel_width -10, 2 * cell_size, sf::Color::White,  "clear", font, sf::Color::Black, font_size);
+	button random_button(nb_columns * cell_size +5, 15 + 4 * cell_size, right_panel_width -10, 2 * cell_size, sf::Color::White,  "random init", font, sf::Color::Black, font_size);
+	button step_button(nb_columns * cell_size +5, 20 + 6 * cell_size, 2 * cell_size, 2 * cell_size, sf::Color::White,  "", font, sf::Color::Black, font_size);
+
 
 
 	while(window.isOpen()){
 
 		while (const std::optional event = window.pollEvent()){
-			if (event->is<sf::Event::Closed>())
-			{
+			if (event->is<sf::Event::Closed>()){
 				window.close();
 			}
 
 			
-			if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>())
-			{
-				if (mouseButtonPressed->button == sf::Mouse::Button::Left)
-				{
+			if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>()){
+
+				if (mouseButtonPressed->button == sf::Mouse::Button::Left){
+
 					int pos_x = mouseButtonPressed->position.x;
 					int pos_y = mouseButtonPressed->position.y;
 
@@ -305,13 +322,16 @@ int main()
 						gol.random();
 					}
 
+					if(step_button.pressed(pos_x, pos_y)){
+						gol.update();
+					}
+
 					if( pos_x < nb_columns * cell_size){
 						int row;
 						int column;
 						screen_coord_to_cell_coord(pos_x , pos_y, row, column, cell_size);
 						gol.switch_cell_state(row, column);
 					}
-
 				}
 			}
 
@@ -324,8 +344,15 @@ int main()
 		pause_button.draw(window);
 		clear_button.draw(window);
 		random_button.draw(window);
+		step_button.draw(window);
+
 
 		window.display();
+
+		pause_button.reset();
+		clear_button.reset();
+		random_button.reset();
+		step_button.reset();
 
 		if(!paused){
 			gol.update();
